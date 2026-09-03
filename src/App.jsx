@@ -6,6 +6,8 @@ import NowPlaying from "./components/NowPlaying.jsx";
 import YouTubePlayer from "./components/YoutubePlayer.jsx";
 import useMusicPlayer from "./hooks/useMusicPlayer.js";
 
+const socket = io(import.meta.env.VITE_API_URL);
+
 export default function App() {
   const player = useMusicPlayer();
 
@@ -20,7 +22,7 @@ export default function App() {
 
       {/* Top */}
       <div className="relative z-10">
-        <TopBar />
+        <TopBar listeners={socket} />
       </div>
 
       {/* CENTER PLAYLIST */}

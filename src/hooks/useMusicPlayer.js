@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 
-const API_BASE = "http://localhost:3001/api/playlist";
+const API_BASE = `${import.meta.env.VITE_API_URL}/api/playlist`;
 const PROGRESS_INTERVAL = 500;
 
 const QUEUE_SIZE = 10;
