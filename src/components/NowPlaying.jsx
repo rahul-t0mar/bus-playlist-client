@@ -25,7 +25,7 @@ export default function NowPlaying({
     <section className="player-card lg:w-155 sm:w-[120%] mx-auto mb-6 py-5.5 px-6.5 border border-[rgba(255,255,255,0.25)] rounded-4xl bg-[rgba(25,25,25,0.36)] backdrop-blur-[5px] shadow-[0_20px_80px_rgba(0,0,0,0.35),inset_0_1px_rgba(255,255,255,0.12)] sm:px-2 sm-py-2">
       <div className="song-info flex items-center gap-4.5">
         <div className={` ${isPlaying ? "animate-[spin_5s_linear_infinite]" : ""}`}>
-          <div className="album-art w-10 h-10 sm:w-20 sm:h-0 shrink-0 overflow-hidden grid items-center rounded-full bg-[rgba(255,255,255,0.14)] border-2 border-[rgba(255,255,255,0.25)] shadow-[0_8px_30px_rgba(0,0,0,0.35)] ">
+          <div className="album-art w-10 h-10 sm:w-20 sm:h-20 shrink-0 overflow-hidden grid items-center rounded-full bg-[rgba(255,255,255,0.14)] border-2 border-[rgba(255,255,255,0.25)] shadow-[0_8px_30px_rgba(0,0,0,0.35)] ">
             {song.artwork ? (
               <img
                 src={song.artwork}
