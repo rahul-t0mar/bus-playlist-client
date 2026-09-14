@@ -210,10 +210,19 @@ export default function useMusicPlayer() {
          *
          * This is especially important if the backend returns
          * the current song again.
+         *
+         * IMPORTANT: if the backend gives us back a song we
+         * already have (e.g. the playlist ran out and it's
+         * repeating from the top, or it's echoing the current
+         * song), stop here instead of looping forever. Without
+         * this the while loop never reaches QUEUE_SIZE and spins
+         * hitting /next indefinitely.
          */
         if (!queueHasSong(normalized.videoId)) {
           queueRef.current.push(normalized);
           syncQueueState();
+        } else {
+          break;
         }
 
         /*
@@ -411,23 +420,47 @@ export default function useMusicPlayer() {
       queueRef.current[PREVIOUS_COUNT];
 
     /*
-     * If there aren't 3 previous songs yet, the current song
-     * is simply the last song in the previous section.
+     * FIX: previously this fell back to
+     * queueRef.current[Math.min(PREVIOUS_COUNT, length - 1)],
+     * which — right after the shift() above — is always the
+     * LAST item in the array. When no next song was buffered
+     * yet, that last item is the song that was just playing,
+     * so it reloaded itself and looped forever once you hit
+     * the end of the playlist.
+     *
+     * Instead: if there's no buffered next song, go fetch one
+     * directly and bail out of this call. Never fall back to
+     * replaying the current/previous song.
      */
-    const fallbackCurrent =
-      queueRef.current[Math.min(
-        PREVIOUS_COUNT,
-        queueRef.current.length - 1,
-      )];
+    if (!newCurrent) {
+      fetch(`${API_BASE}/next`)
+        .then((res) => res.json())
+        .then((data) => {
+          const normalized = normalizeSong(data);
 
-    const currentSong = newCurrent || fallbackCurrent;
+          if (!normalized) return;
 
-    if (!currentSong) return;
+          queueRef.current.push(normalized);
+
+          syncQueueState();
+
+          loadSongIntoPlayer(normalized, true);
+
+          prefetchQueue();
+        })
+        .catch((err) => {
+          console.error("Failed to load next song:", err);
+        });
+
+      syncQueueState();
+
+      return;
+    }
 
     /*
      * Load immediately from memory.
      */
-    loadSongIntoPlayer(currentSong, true);
+    loadSongIntoPlayer(newCurrent, true);
 
     syncQueueState();
 
